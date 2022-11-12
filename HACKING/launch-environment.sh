@@ -14,6 +14,7 @@ fi
 
 uname=$USER # Just trust me on this one.
 container='devcade-dotnet'
+name='devcade-dotnet'
 
 while getopts ":hu:d:" option; do
     case $option in
@@ -21,6 +22,8 @@ while getopts ":hu:d:" option; do
             uname=$OPTARG;;
         d) # choose which container to use
             container=$OPTARG;;
+        n) # set container name
+            name=$OPTARG;;
         h)
             help
             exit;;
@@ -34,7 +37,7 @@ mkdir -p "$xauth_path"
 cp "$HOME"/.Xauthority "$xauth_path"
 chmod g+rwx "$xauth_path"/.Xauthority
 
-podman run --name="$container" --rm -it                                \
+podman run --name="$name" --rm -it                                \
     -e DISPLAY="$DISPLAY"                                              \
     --network=host                                                     \
     --cap-add=SYS_PTRACE                                               \

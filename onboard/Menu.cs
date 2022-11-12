@@ -45,8 +45,8 @@ namespace onboard
         public void updateDims(GraphicsDeviceManager _graphics) 
         {
             // This will be the apect ratio of the screen on the machine
-            _sWidth = 1080;
-            _sHeight = 1920;
+            _sWidth = Int32.Parse(Environment.GetEnvironmentVariable("VIEW_WIDTH"));
+            _sHeight = Int32.Parse(Environment.GetEnvironmentVariable("VIEW_HEIGHT"));
 
             _graphics.PreferredBackBufferHeight = _sHeight;
             _graphics.PreferredBackBufferWidth = _sWidth;
@@ -66,9 +66,9 @@ namespace onboard
             return gameTitles.Count;
         }
 
-        public string gameSelected()
+        public DevcadeGame gameSelected()
         {
-            return gameTitles.ElementAt(itemSelected).name;
+            return gameTitles.ElementAt(itemSelected);
         }
 
         public void drawBackground(SpriteBatch _spriteBatch, Texture2D BGgradient, Texture2D icon, float col, GameTime gameTime)

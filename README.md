@@ -48,6 +48,18 @@ _Helpful Tip: Remember to `chmod +x onboard`. You may get weird syntax errors if
 
 To setup and launch a development environment, you can do the following:
 
+### Env Vars
+Create a `.env` file with the following values.
+
+```
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+AWS_DEFAULT_REGION
+DEVCADE_API_DOMAIN
+```
+
+### Building and Launching the Container
+
 ```
 cd HACKING
 ./build-environment.sh

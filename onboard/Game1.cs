@@ -104,7 +104,7 @@ namespace onboard
 
                 case "loading":
                     // Check for process that matches last launched game and display loading screen if it's running 
-                    _loading = Util.IsProcessOpen(_mainMenu.gameSelected());
+                    _loading = Util.IsProcessOpen(_mainMenu.gameSelected().name);
                     
                     if(fadeColor < 1f)
                     {

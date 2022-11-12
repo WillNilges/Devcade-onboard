@@ -33,16 +33,22 @@ namespace onboard
 
     public class DevcadeClient
     {
-        private string _accessKey = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
-        private string _secretKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
+        private string _accessKey;
+        private string _secretKey;
 
-        private string _bucketName = "devcade-games";
+        private string _bucketName;
 
         private static AmazonS3Config _config;
         private static AmazonS3Client _s3Client;
 
+        private string _apiDomain;
+
         public DevcadeClient()
         {
+            _accessKey = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
+            _secretKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
+            _bucketName = "devcade-games";
+
             _config = new AmazonS3Config();
             _config.ServiceURL = "https://s3.csh.rit.edu";
             _config.ForcePathStyle = true;
@@ -52,6 +58,8 @@ namespace onboard
                     _secretKey,
                     _config
             );
+
+            _apiDomain = Environment.GetEnvironmentVariable("DEVCADE_API_DOMAIN");
         }
         
         public List<DevcadeGame> GetGames()
@@ -67,7 +75,7 @@ namespace onboard
                 // Call asynchronous network methods in a try/catch block to handle exceptions.
             try
             {
-                string uri = "https://devcade-api.apps.okd4.csh.rit.edu/api/games/gamelist/"; // TODO: Env variable URI tld 
+                string uri = $"https://{_apiDomain}/api/games/gamelist/"; // TODO: Env variable URI tld 
                 string responseBody = await client.GetStringAsync(uri);
 
                 games = JsonConvert.DeserializeObject<List<DevcadeGame>>(responseBody);
@@ -85,35 +93,42 @@ namespace onboard
         // permissions can be an int or a string. For example it can also be +x, -x etc..
         bool Chmod(string filePath, string permissions = "700", bool recursive = false)
         {
-                string cmd;
-                if (recursive)
-                    cmd = $"chmod -R {permissions} {filePath}";
-                else
-                    cmd = $"chmod {permissions} {filePath}";
+            string cmd;
+            if (recursive)
+                cmd = $"chmod -R {permissions} {filePath}";
+            else
+                cmd = $"chmod {permissions} {filePath}";
 
-                try
+            try
+            {
+                using (Process proc = Process.Start("/bin/bash", $"-c \"{cmd}\""))
                 {
-                    using (Process proc = Process.Start("/bin/bash", $"-c \"{cmd}\""))
-                    {
-                        proc.WaitForExit();
-                        return proc.ExitCode == 0;
-                    }
+                    proc.WaitForExit();
+                    return proc.ExitCode == 0;
                 }
-                catch
-                {
-                    return false;
-                }
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public void runGame(string game)
+        public void runGame(DevcadeGame game)
         {
-            TransferUtility fileTransferUtility = new TransferUtility(_s3Client);
-
             string path = "/tmp/" + game + ".zip";
 
             Console.WriteLine("Getting " + game);
-            // Note the 'fileName' is the 'key' of the object in S3 (which is usually just the file name)
-            fileTransferUtility.Download(path, _bucketName, game);
+
+            using (var client = new HttpClient())
+            {
+                using (var s = client.GetStreamAsync($"https://{_apiDomain}/api/games/download/${game.id}"))
+                {
+                    using (var fs = new FileStream(path, FileMode.OpenOrCreate))
+                    {
+                        s.Result.CopyTo(fs);
+                    }
+                }
+            }
 
             try
             {
@@ -157,13 +172,6 @@ namespace onboard
             return response;
         }
         
-        /// <summary>
-        /// Shows how to list the objects in an Amazon S3 bucket.
-        /// </summary>
-        /// <param name="bucketName">The name of the bucket for which to list
-        /// the contents.</param>
-        /// <returns>A boolean value indicating the success or failure of the
-        /// copy operation.</returns>
         public async Task<List<string>> ListBucketContentsAsync(string bucketName)
         {
             try

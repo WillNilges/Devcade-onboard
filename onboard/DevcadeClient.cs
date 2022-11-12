@@ -55,28 +55,7 @@ namespace onboard
                 return new List<DevcadeGame>();
             }
         }
-/*
-        async Task<List<DevcadeGame>> asyncGetGames()
-        {
-            HttpClient client = new HttpClient();
-            List<DevcadeGame> games;
-                // Call asynchronous network methods in a try/catch block to handle exceptions.
-            try
-            {
-                string uri = $"https://{_apiDomain}/api/games/gamelist/"; // TODO: Env variable URI tld 
-                string responseBody = await client.GetStringAsync(uri);
 
-                games = JsonConvert.DeserializeObject<List<DevcadeGame>>(responseBody);
-                return games;
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
-            }
-            return new List<DevcadeGame>();
-        }
-*/
         // Returns true if success and false otherwise
         // permissions can be an int or a string. For example it can also be +x, -x etc..
         bool Chmod(string filePath, string permissions = "700", bool recursive = false)

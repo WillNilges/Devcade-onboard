@@ -82,13 +82,15 @@ namespace onboard
 
         public void runGame(DevcadeGame game)
         {
-            string path = "/tmp/" + game + ".zip";
-
-            Console.WriteLine("Getting " + game);
+            string gameName = game.name.Replace(' ', '_');
+            Console.WriteLine($"Game is: {gameName}");
+            string path = $"/tmp/{gameName}.zip";
+            string URI = $"https://{_apiDomain}/api/games/download/{game.id}";
+            Console.WriteLine($"Getting {gameName} from {URI}.");
 
             using (var client = new HttpClient())
             {
-                using (var s = client.GetStreamAsync($"https://{_apiDomain}/api/games/download/${game.id}"))
+                using (var s = client.GetStreamAsync(URI))
                 {
                     using (var fs = new FileStream(path, FileMode.OpenOrCreate))
                     {
@@ -99,16 +101,16 @@ namespace onboard
 
             try
             {
-                Console.WriteLine("Extracting " + path);
+                Console.WriteLine($"Extracting {path}");
                 // Extract the specified path (the zip file) to the specified directory (/tmp/, probably)
-                System.IO.Directory.CreateDirectory("/tmp/" + game);
-                ZipFile.ExtractToDirectory(path, "/tmp/" + game);
+                System.IO.Directory.CreateDirectory($"/tmp/{gameName}");
+                ZipFile.ExtractToDirectory(path, $"/tmp/{gameName}");
             } catch (System.IO.IOException e) {
                 Console.WriteLine(e);
             }
 
-            string execPath = "/tmp/" + game + "/publish/" + game;
-            Console.WriteLine("Running " + execPath);
+            string execPath = $"/tmp/{gameName}/publish/{gameName}";
+            Console.WriteLine("Running {execPath}");
             Chmod(execPath,"+x",false);
             Process process = new Process()
             {

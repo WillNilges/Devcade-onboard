@@ -44,7 +44,7 @@ podman run --name="$name" --rm -it                                \
     --group-add keep-groups                                            \
     --annotation io.crun.keep_original_groups=1                        \
     -v "$xauth_path"/.Xauthority:/root/.Xauthority:Z                   \
-    -v ./:/onboard:Z                                                \
+    -v ./:/devcade:Z                                                \
     -v /tmp/.X11-unix:/tmp/.X11-unix                                   \
     --env 'PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH'  \
     "$container"

@@ -109,8 +109,8 @@ namespace onboard
                 Console.WriteLine(e);
             }
 
-            string execPath = $"/tmp/{gameName}/publish/{gameName}";
-            Console.WriteLine("Running {execPath}");
+            string execPath = $"/tmp/{gameName}/publish/{gameName.Replace("_","")}";
+            Console.WriteLine($"Running {execPath}");
             Chmod(execPath,"+x",false);
             Process process = new Process()
             {

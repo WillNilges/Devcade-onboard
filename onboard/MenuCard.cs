@@ -113,16 +113,16 @@ namespace onboard
             cardColor.B -= (byte)(colorSpeed * elapsed);
         }
 
-        public void DrawSelf(SpriteBatch _spriteBatch, Texture2D cardTexture, SpriteFont font, int _sHeight)
+        public void DrawSelf(SpriteBatch _spriteBatch, Texture2D cardTexture, SpriteFont font, int _sHeight, int scalingAmount)
         {
             _spriteBatch.Draw(
                 cardTexture,
-                new Vector2(0, _sHeight / 2 + cardTexture.Height / 2),
+                new Vector2(0, _sHeight / 2 + cardTexture.Height / (2*scalingAmount)),
                 null,
                 cardColor,
                 rotation,
                 new Vector2(0, cardTexture.Height / 2),
-                scale, 
+                scale/scalingAmount, 
                 SpriteEffects.None,
                 0f
                 );

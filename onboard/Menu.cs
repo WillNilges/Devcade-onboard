@@ -30,6 +30,7 @@ namespace onboard
 
         private int _sWidth;
         private int _sHeight;
+        private int scalingAmount = 0;
 
         private float moveTime = 0.15f; // This is the total time the scrolling animation takes
         private float timeRemaining = 0f;
@@ -47,6 +48,8 @@ namespace onboard
             // This will be the apect ratio of the screen on the machine
             _sWidth = Int32.Parse(Environment.GetEnvironmentVariable("VIEW_WIDTH"));
             _sHeight = Int32.Parse(Environment.GetEnvironmentVariable("VIEW_HEIGHT"));
+
+            scalingAmount = 1920/_sHeight; // This is the ratio of the optimal height to the current height, used to scale elements
 
             _graphics.PreferredBackBufferHeight = _sHeight;
             _graphics.PreferredBackBufferWidth = _sWidth;
@@ -123,12 +126,11 @@ namespace onboard
 
             _spriteBatch.Draw(
                 titleTexture,
-                new Vector2(_sWidth / 2,50),
+                new Rectangle(0,0, _sWidth, titleTexture.Height/scalingAmount),
                 null,
                 new Color(col,col,col),
                 0f,
-                new Vector2(_sWidth / 2,0),
-                1f,
+                new Vector2(0,0),
                 SpriteEffects.None,
                 0f
             );
@@ -223,39 +225,50 @@ namespace onboard
 
         public void drawDescription(SpriteBatch _spriteBatch, Texture2D descTexture, SpriteFont titleFont, SpriteFont descFont)
         {
-            Vector2 titleSize = titleFont.MeasureString("Meatball Mania");
-            Vector2 descSize = descFont.MeasureString("What's up, check out this cool game");
-            Vector2 descPos = new Vector2(_sWidth/2, _sHeight/2 + descTexture.Height/6);
+            // If fonts on this page look blurry, then increase the font size in the .spritefont
+            // TODO: Figure out how to format a large paragraph of text on the description
+            //       Decide on a description page layout/style
+            //       Add some cool animations
+            
+            Vector2 descPos = new Vector2(_sWidth/2, _sHeight/2 + descTexture.Height/(6*scalingAmount));
 
             _spriteBatch.Draw(descTexture, 
                 descPos,
                 null,
-                Color.DarkRed,
+                Color.Purple,
                 0f,
                 new Vector2(descTexture.Width/2,descTexture.Height/2),
-                1f,
+                1f/scalingAmount,
                 SpriteEffects.None,
                 0f
                 );
 
-            _spriteBatch.DrawString(titleFont,
-                "Meatball Mania",
-                new Vector2(descPos.X, descPos.Y - descTexture.Height/3),
-                Color.White,
-                0f,
-                new Vector2(titleSize.X/2,titleSize.Y/2),
-                1f,
-                SpriteEffects.None,
-                0f
+            writeString( _spriteBatch,
+                titleFont,
+                gameSelected().name,
+                new Vector2(descPos.X, descPos.Y - descTexture.Height/(3*scalingAmount)),
+                1f
             );
 
-            _spriteBatch.DrawString(descFont,
-                "What's up, check out this cool game",
-                new Vector2(descPos.X, descPos.Y),
+            writeString(_spriteBatch,
+                descFont,
+                gameSelected().author,
+                new Vector2(descPos.X, descPos.Y - descTexture.Height/(4*scalingAmount)),
+                1.5f
+            );
+        }
+
+        public void writeString(SpriteBatch _spriteBatch, SpriteFont font, string str, Vector2 pos, float scale)
+        {
+            Vector2 strSize = font.MeasureString(str);
+
+            _spriteBatch.DrawString(font,
+                str,
+                pos,
                 Color.White,
                 0f,
-                new Vector2(descSize.X/2,descSize.Y/2),
-                1f,
+                new Vector2(strSize.X/2,strSize.Y/2),
+                scale/scalingAmount,
                 SpriteEffects.None,
                 0f
             );
@@ -268,7 +281,7 @@ namespace onboard
             {
                 if(Math.Abs(card.listPos) == 4)
                 {
-                   card.DrawSelf(_spriteBatch, cardTexture, font, _sHeight);
+                   card.DrawSelf(_spriteBatch, cardTexture, font, _sHeight, scalingAmount);
                 }
                 
             }
@@ -276,7 +289,7 @@ namespace onboard
             {
                 if(Math.Abs(card.listPos) == 3)
                 {
-                   card.DrawSelf(_spriteBatch, cardTexture, font, _sHeight);
+                   card.DrawSelf(_spriteBatch, cardTexture, font, _sHeight, scalingAmount);
                 }
                 
             }
@@ -284,7 +297,7 @@ namespace onboard
             {
                 if(Math.Abs(card.listPos) == 2)
                 {
-                   card.DrawSelf(_spriteBatch, cardTexture, font, _sHeight);
+                   card.DrawSelf(_spriteBatch, cardTexture, font, _sHeight, scalingAmount);
                 }
                 
             }
@@ -292,7 +305,7 @@ namespace onboard
             {
                 if(Math.Abs(card.listPos) == 1)
                 {
-                   card.DrawSelf(_spriteBatch, cardTexture, font, _sHeight);
+                   card.DrawSelf(_spriteBatch, cardTexture, font, _sHeight, scalingAmount);
                 }
                 
             }
@@ -300,7 +313,7 @@ namespace onboard
             {
                 if(Math.Abs(card.listPos) == 0)
                 {
-                   card.DrawSelf(_spriteBatch, cardTexture, font, _sHeight);
+                   card.DrawSelf(_spriteBatch, cardTexture, font, _sHeight, scalingAmount);
                 }
                 
             }
